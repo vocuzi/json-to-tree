@@ -1,0 +1,104 @@
+
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+
+<title>JSON to Tree</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<style type="text/css">
+   body {
+    font-family: sans-serif;
+    max-width: 1600px;
+    margin: 10px auto;
+   }
+    svg.vtree {
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid grey;
+    width: 100%;
+  }
+  textarea {
+    width: 100%;
+    display: block;
+    height: 300px;
+  }
+</style>
+
+<script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="tree.js"></script>
+
+<!-- How to use debug mode.
+  1. open browser's developer tools.
+  2. input the following command.
+     vt.debug(true).update()
+-->
+
+<script type="text/javascript">
+var vt;
+
+window.onload = function () {
+  var container = document.getElementById("container");
+  var msg = document.getElementById("msg");
+  vt = new VTree(container);
+  var reader = new VTree.reader.Object();
+
+  function updateTree() {
+    var s = document.getElementById("from-text").value;
+
+    msg.innerHTML = '';
+
+    try {
+      var jsonData = JSON.parse(s);
+    } catch (e) {
+      msg.innerHTML = 'JSON parse error: ' + e.message;
+    }
+
+    var data = reader.read(jsonData);
+
+    vt.data(data)
+      .update();
+  }
+
+  function createSvgString() {
+    document.getElementById("svg-text").value = vt.createSvgString();
+  }
+
+  document.getElementById("go-button").onclick = updateTree;
+  document.getElementById("svg-button").onclick = createSvgString;
+
+  updateTree();
+};
+
+</script>
+
+</head>
+
+<body>
+  <div class="container">
+
+    <h1>JSON to Tree Converter</h1>
+    <div style="margin-top: 1em;">
+      <label for="from-text">JSON</label><br>
+      <textarea id="from-text">[{ "array": [ 1, 2, [3, 4], 5 ], "boolean": true, "null": null, "number": 123, "object": { "a": "b", "c": "d", "e": "f" }, "string": "Hello World" }, { "|": "|", "  ": { "ʕ": "" }, " ": ["◕", [ { "hello! ": "<ﾆフ" } ], "◕"], "_": { "": "ʔ" } }]</textarea>
+    </div>
+
+    <div style="margin-top: 1em;">
+      <input id="go-button" type="button" value="Visualize">
+    </div>
+
+    <div id="msg" style="color: red;"></div>
+
+    <div id="container"></div>
+
+    <div style="margin-top: 1em;">
+      <input id="svg-button" type="button" value="Get SVG String">
+    </div>
+
+    <div style="margin-top: 1em;">
+      <textarea id="svg-text"></textarea>
+    </div>
+  </div>
+</body>
+</html>
